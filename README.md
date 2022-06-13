@@ -5,7 +5,6 @@ Automatically provision a KVM virtual machine (managed through libvirt) on an Ub
 
 Variables that define various parameters of the VM that will be provisioned are in the hosts.yml file. They should be set before running any of the playbooks.
 
----
 For these playbooks to work on your ansible control node you'll need: 
   ansible-core
   ansible-galaxy collections:
@@ -16,4 +15,6 @@ For these playbooks to work on your ansible control node you'll need:
   packages:
     - cloud-image-utils
   (to be continued)
----
+
+With Ansible installed, you can install Ansible Galaxy collection and roles required by this project by running: 
+  ansible-galaxy install -r requirements.yml
