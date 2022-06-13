@@ -1,7 +1,7 @@
 version: 2
 ethernets:
   enp1s0:
-    addresses: [ 192.168.123.2/24 ]
+    addresses: [ 192.168.123.3/24 ]  # TODO use variables instead
     gateway4: 192.168.123.1
     nameservers:
       addresses: # TODO consider using universal DNS servers like 8.8.8.8 or passing KVM host's DNS settings to VM

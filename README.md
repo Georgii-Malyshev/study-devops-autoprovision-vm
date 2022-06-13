@@ -3,6 +3,8 @@ Private project to study DevOps tools and methodology
 
 Automatically provision a KVM virtual machine (managed through libvirt) on an Ubuntu Desktop 20.04 LTS/22.04 LTS. Also included is a playbook that allows tearing down created environment.
 
+Variables that define various parameters of the VM that will be provisioned are in the hosts.yml file. They should be set before running any of the playbooks.
+
 ---
 For these playbooks to work on your ansible control node you'll need: 
   ansible-core
