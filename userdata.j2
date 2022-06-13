@@ -27,4 +27,4 @@ users:
     passwd: {{ admin_user_password_hash }}
 
 runcmd:
-  - "sh -c echo '192.168.123.2' {{ vm_name }} | tee -a /etc/hosts"
+  - "sh -c echo '192.168.123.2' {{ vm_name }} | tee -a /etc/hosts"  # Use a variable for IP address
