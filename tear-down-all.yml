@@ -11,21 +11,57 @@
   become_method: sudo
 
   tasks:
-    - name: Destroy created VM
+    # Destroy VM
+    - name: Get a list of all VMs that are defined on host
       community.libvirt.virt:
-        name: '{{ vm_name }}'
-        state: destroyed # TODO check if it exists first OR don't fail if it's not found
+        command: list_vms
+      register: vm_list
 
-    - name: Undefine created VM
+    - name: Set fact 'vm_exists' to 'False' before checking whether the VM exists
+      set_fact:
+        vm_exists: False
+
+    - name: Check whether the VM exists
+      set_fact:
+        vm_exists: True
+      loop: '{{ vm_list.list_vms }}'
+      when: item is search('{{ vm_name }}')
+
+    - name: Destroy created VM if it exists
       community.libvirt.virt:
         name: '{{ vm_name }}'
-        command: undefine # TODO non-idempotent command! Consider making some checks beforehand
+        state: destroyed
+      when: vm_exists == True
+
+    - name: Undefine created VM if it exists
+      community.libvirt.virt:
+        name: '{{ vm_name }}'
+        command: undefine
+      when: vm_exists == True
+
+    # Destroy virtual network
+    - name: Get a list of all virtual networks that are defined on host
+      community.libvirt.virt_net:
+        command: list_nets
+      register: vnet_list
+
+    - name: Set fact 'vnet_exists' to 'False' before checking whether the virtual network exists
+      set_fact:
+        vnet_exists: False
+
+    - name: Check whether the virtual network exists
+      set_fact:
+        vnet_exists: True
+      loop: '{{ vnet_list.list_nets }}'
+      when: item is search('{{ vnet_name }}')
 
     - name: Destroy created virtual network
       community.libvirt.virt_net:
-        name: vnet01
+        name: '{{ vnet_name }}'
         state: absent
+      when: vnet_exists == True
 
+    # Destroy libvirt pool
     - name: Deactivate created pool
       community.libvirt.virt_pool:
         name: '{{ libvirt_pool_name }}'
@@ -38,5 +74,6 @@
       community.libvirt.virt_pool:
         name: '{{ libvirt_pool_name }}'
         state: deleted
+
     - name: Delete generated XML files # TODO check if files exist before executing OR check return code of rm command
       ansible.builtin.command: rm vm-domain.xml vm-volume.xml
