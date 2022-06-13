@@ -1,0 +1,14 @@
+<volume type='file'>
+  <name>{{ vm_volume_name }}</name>
+  <source>
+  </source>
+  <capacity unit='GB'>{{ vm_volume_capacity_GB }}</capacity>
+  <target>
+    <format type='qcow2'/>
+    <permissions>
+      <mode>0700</mode>
+      <owner>0</owner>
+      <group>0</group>
+    </permissions>
+  </target>
+</volume>

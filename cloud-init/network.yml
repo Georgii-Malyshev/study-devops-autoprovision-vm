@@ -1,0 +1,9 @@
+version: 2
+ethernets:
+  enp1s0:
+    addresses: [ 192.168.123.2/24 ]
+    gateway4: 192.168.123.1
+    nameservers:
+      addresses: # TODO consider using universal DNS servers like 8.8.8.8 or passing KVM host's DNS settings to VM
+        - 10.99.1.11
+        - 10.77.1.70

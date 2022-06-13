@@ -1,0 +1,4 @@
+- name: Remove old key
+  become: no
+  ansible.builtin.command: |
+    ssh-keygen -f "/home/{{ lookup('env', 'USER') }}/.ssh/known_hosts" -R "192.168.123.2"

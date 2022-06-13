@@ -1,0 +1,42 @@
+---
+# This playbook destroys virtual infrastructure that playbook 'virthost.yml'
+# sets up: VM, virtual network, associated libvirt volumes and pool, XML files
+
+# run this playbook with --ask-become-pass option if needed
+
+- name: Tear down virtual infrastructure
+  hosts: kvm_hosts
+  connection: local
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Destroy created VM
+      community.libvirt.virt:
+        name: '{{ vm_name }}'
+        state: destroyed # TODO check if it exists first OR don't fail if it's not found
+
+    - name: Undefine created VM
+      community.libvirt.virt:
+        name: '{{ vm_name }}'
+        command: undefine # TODO non-idempotent command! Consider making some checks beforehand
+
+    - name: Destroy created virtual network
+      community.libvirt.virt_net:
+        name: vnet01
+        state: absent
+
+    - name: Deactivate created pool
+      community.libvirt.virt_pool:
+        name: '{{ libvirt_pool_name }}'
+        state: inactive
+
+    - name: Delete volume files # necessary so that pool can be deleted
+      ansible.builtin.shell: rm -rf '{{ libvirt_pool_dir }}'/*
+
+    - name: Delete created pool
+      community.libvirt.virt_pool:
+        name: '{{ libvirt_pool_name }}'
+        state: deleted
+    - name: Delete generated XML files # TODO check if files exist before executing OR check return code of rm command
+      ansible.builtin.command: rm vm-domain.xml vm-volume.xml
