@@ -1,4 +1,4 @@
 # config files templated-out from Jijna2 templates by Ansible
-cloud-init/userdata.yml
+cloud-init/*
 vm-domain.xml
 vm-volume.xml

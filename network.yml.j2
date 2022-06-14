@@ -1,0 +1,8 @@
+version: 2
+ethernets:
+  enp1s0:
+    addresses:
+      - {{ vm_net_ip }}/{{ vm_net_mask_CIDR }}
+    gateway4: {{ vm_net_gateway4 }}
+    nameservers:
+      addresses: {{ vm_net_nameservers }}

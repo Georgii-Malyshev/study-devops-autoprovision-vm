@@ -2,7 +2,8 @@
 hostname: {{ vm_name }}
 fqdn: {{ vm_name_fqdn }}
 
-manage_etc_hosts: false # /etc/hosts gets updated with the help of runcmd later
+# /etc/hosts gets updated with the help of runcmd later
+manage_etc_hosts: false
 
 disable_root: true
 
@@ -27,4 +28,4 @@ users:
     passwd: {{ admin_user_password_hash }}
 
 runcmd:
-  - "sh -c echo '192.168.123.2' {{ vm_name }} | tee -a /etc/hosts"  # Use a variable for IP address
+  - "sh -c echo '{{ vm_net_ip }}' {{ vm_name }} | tee -a /etc/hosts"

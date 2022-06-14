@@ -146,11 +146,19 @@
 
 - name: Template out cloud-init's userdata config file
   ansible.builtin.template:
-    src: userdata.j2
+    src: userdata.yml.j2
     dest: cloud-init/userdata.yml  # TODO consider deleting this file after provisioning the VM
     owner: root
     group: root
     mode: '0770'
+
+- name: Template out cloud-init's network config file
+  ansible.builtin.template:
+    src: network.yml.j2
+    dest: cloud-init/network.yml  # TODO consider deleting this file after provisioning the VM
+    owner: root
+    group: root
+    mode: '0774'
 
 - name: Create cloud-init seed image
   ansible.builtin.command: |
