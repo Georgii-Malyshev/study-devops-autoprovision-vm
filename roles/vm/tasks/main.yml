@@ -1,0 +1,108 @@
+---
+# Create libvirt volume for VM
+
+- name: Check whether the volume exists
+  ansible.builtin.shell: |
+    virsh vol-list --pool={{ libvirt_pool_name }} | grep "{{ vm_volume_name }}"
+  register:
+    volume_search_result
+  # grep returns code 1 if given string wasn't found, so don't fail if that's the case
+  failed_when: volume_search_result.rc != 0 and volume_search_result.rc != 1
+  changed_when: False
+
+- name: Create volume if it doesn't exist
+  block:
+    - name: Create XML file for the volume definition from template
+      ansible.builtin.template:
+        src: vm-volume.xml.j2
+        dest: "vm-volume.xml"
+    - name: Create volume
+      ansible.builtin.shell: |
+        virsh vol-create --pool={{ libvirt_pool_name }} vm-volume.xml
+  when: volume_search_result.rc == 1
+
+# Create VM image
+
+- name: Download base image
+  ansible.builtin.get_url:
+    url: '{{ base_image_url }}'
+    dest: '{{ base_image_download_dest }}'
+    checksum: sha256:'{{ base_image_sha256sum }}'
+
+- name: Copy base image to storage pool directory
+  ansible.builtin.copy:
+    src: '{{ base_image_download_dest }}'
+    dest: '{{ libvirt_pool_dir }}/{{ vm_name }}.qcow2'
+    force: no
+    remote_src: yes
+    mode: '0660'
+  register: copy_result
+
+# TODO make this task idempotent
+- name: Resize VM image
+  ansible.builtin.command: |
+    qemu-img resize '{{ libvirt_pool_dir }}/{{ vm_name }}.qcow2' {{ vm_image_size_GB }}G
+
+- name: Template out cloud-init's userdata config file
+  ansible.builtin.template:
+    src: userdata.yml.j2
+    dest: cloud-init/userdata.yml  # TODO consider deleting this file after provisioning the VM
+    owner: root
+    group: root
+    mode: '0770'
+
+- name: Template out cloud-init's network config file
+  ansible.builtin.template:
+    src: network.yml.j2
+    dest: cloud-init/network.yml  # TODO consider deleting this file after provisioning the VM
+    owner: root
+    group: root
+    mode: '0774'
+
+- name: Create cloud-init seed image
+  ansible.builtin.command: |
+    cloud-localds -v \
+    --network-config=cloud-init/network.yml \
+    {{ libvirt_pool_dir }}/{{ vm_name }}-seed.qcow2 \
+    cloud-init/userdata.yml
+
+# Set up the VM
+
+- name: Get a list of all VMs that are defined on host
+  community.libvirt.virt:
+    command: list_vms
+  register: vm_list
+
+- name: Set fact 'vm_exists' to 'False' before checking whether the VM exists
+  set_fact:
+    vm_exists: False
+
+- name: Check whether the VM exists
+  set_fact:
+    vm_exists: True
+  loop: '{{ vm_list.list_vms }}'
+  when: item is search('{{ vm_name }}')
+
+- name: Create VM if it doesn't exist
+  block:
+    - name: Create XML file for the VM definition from template
+      ansible.builtin.template:
+        src: vm-domain.xml.j2
+        dest: "vm-domain.xml"
+
+    - name: Create the VM
+      community.libvirt.virt:
+        command: define
+        xml: '{{ lookup("template", "vm-domain.xml.j2")}}'
+
+    - name: Stop the VM from starting automatically
+      community.libvirt.virt:
+        name: '{{ vm_name }}'
+        autostart: no
+  when: vm_exists == False
+  notify: Remove old key
+
+- name: Start the VM
+  community.libvirt.virt:
+    name: '{{ vm_name }}'
+    state: running

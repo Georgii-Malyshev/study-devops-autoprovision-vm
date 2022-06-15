@@ -1,13 +1,12 @@
-# This playbook prepares localhost to manage KVM virtual machines through libvirt and
-# provisions a VM based on a cloud image
+# This playbook provisions a VM based on a cloud image on the specified KVM hosts
 # run this playbook with --ask-become-pass option if running it as a user who doesn't
 # have passwordless sudo access
 
-- name: KVM host setup and VM creation
+- name: VM provisioning
   hosts: kvm_hosts
   connection: local
   become: yes
   become_method: sudo
 
   roles:
-    - kvm_host
+    - vm
