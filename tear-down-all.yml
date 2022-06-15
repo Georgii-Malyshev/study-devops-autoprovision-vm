@@ -1,7 +1,6 @@
 ---
-# This playbook destroys virtual infrastructure that playbook 'virthost.yml'
-# sets up: VM, virtual network, associated libvirt volumes and pool, XML files
-
+# This playbook destroys virtual infrastructure that other playbooks set up:
+# VM, virtual network, associated libvirt volumes and pool, XML configuration files
 # run this playbook with --ask-become-pass option if needed
 
 - name: Tear down virtual infrastructure
