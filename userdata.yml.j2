@@ -25,6 +25,8 @@ users:
       - adm
       - sudo
     lock_passwd: false
+    ssh_authorized_keys:
+      - {{ ssh_authorized_key }}
     passwd: {{ admin_user_password_hash }}
 
 runcmd:
