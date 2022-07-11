@@ -13,5 +13,6 @@ For these playbooks to work on an Ansible control node the following dependencie
 - packages:
   - cloud-image-utils
 
-With Ansible installed, you can install Ansible Galaxy collection and roles required by this project by running: 
-  ansible-galaxy install -r requirements.yml
+With Ansible installed, you can install Ansible Galaxy collection and roles required by this project by running: \
+\
+ansible-galaxy install -r requirements.yml
