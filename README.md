@@ -1,20 +1,17 @@
-# devops-study-project-vm
-Private project to study DevOps tools and methodology
+# ansible-autoprovision-vm
+Small Ansible-based project that can automatically provision a KVM virtual machine (managed through libvirt) on an Ubuntu Desktop 20.04 LTS/22.04 LTS. Also included is a playbook that allows tearing down created environment.
 
-Automatically provision a KVM virtual machine (managed through libvirt) on an Ubuntu Desktop 20.04 LTS/22.04 LTS. Also included is a playbook that allows tearing down created environment.
+Variables that define various parameters of the VM to be provisioned are defined in an YAML-format inventory file. They should be set before running any of the playbooks.
 
-Variables that define various parameters of the VM that will be provisioned are in the hosts.yml file. They should be set before running any of the playbooks.
-
-For these playbooks to work on your ansible control node you'll need: 
-  ansible-core
-  ansible-galaxy collections:
-    - community.general
-    - community.libvirt
-  ansible-galaxy roles:
-    - geerlingguy.swap (https://galaxy.ansible.com/geerlingguy/swap) - install with 'ansible-galaxy install geerlingguy.swap')
-  packages:
-    - cloud-image-utils
-  (to be continued)
+For these playbooks to work on an Ansible control node the following dependencies must be met: 
+- ansible-core
+- ansible-galaxy collections:
+  - community.general
+  - community.libvirt
+- ansible-galaxy roles:
+  - geerlingguy.swap (https://galaxy.ansible.com/geerlingguy/swap) - install with 'ansible-galaxy install geerlingguy.swap')
+- packages:
+  - cloud-image-utils
 
 With Ansible installed, you can install Ansible Galaxy collection and roles required by this project by running: 
   ansible-galaxy install -r requirements.yml
